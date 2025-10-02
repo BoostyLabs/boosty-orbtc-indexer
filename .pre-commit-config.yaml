@@ -1,0 +1,42 @@
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
+
+
+### Install pre-commit tool with python3:
+# pip install pre-commit
+
+### Install pre-commit hooks to run automatically:
+# pre-commit install
+
+### Or run manually on all files:
+# pre-commit run --all-files
+
+repos:
+# generic goodies
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: v5.0.0
+  hooks:
+  - id: trailing-whitespace
+    exclude: ^src/db/migrations/.*\.sql$
+  - id: end-of-file-fixer
+    exclude: ^src/db/migrations/.*\.sql$
+
+  # these fail if there are any parsing issues in yaml, toml, json files
+  - id: check-yaml
+  - id: check-toml
+  - id: check-json
+
+# sql linter
+- repo: https://github.com/sqlfluff/sqlfluff
+  rev: 3.3.0
+  hooks:
+  - id: sqlfluff-fix
+    name: sqlfluff indexer
+    files: ^orbtc/src/db/migrations/.*\.sql
+
+# swagger.yaml linter
+- repo: https://github.com/python-openapi/openapi-spec-validator
+  rev: 0.7.1
+  hooks:
+  -   id: openapi-spec-validator
+      files: ^docs/swagger/swagger\.yaml$

@@ -1,0 +1,16 @@
+FROM rust
+
+RUN apt-get update && apt-get install -y pkg-config libpq-dev
+
+WORKDIR /build
+COPY . .
+
+RUN cargo build --release -p orbtc
+
+RUN ls ./target/release \
+    && cp ./target/release/orbtc ./indexer/bin/ \
+    && cp ./target/release/orbtc-api ./indexer/bin/ \
+    && cp ./target/release/orbtc-indexer ./indexer/bin/ \
+    && rm -rf ./target
+
+RUN cp -rf /build/indexer/bin /opt/release

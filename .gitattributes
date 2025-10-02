@@ -1,0 +1,2 @@
+.sqlx/*.json binary
+.sqlx/*.json linguist-generated=true

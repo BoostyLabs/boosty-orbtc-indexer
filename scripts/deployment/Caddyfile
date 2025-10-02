@@ -1,0 +1,11 @@
+https://orbtc-api.example.com {
+    encode zstd gzip
+
+    @btcv4 {
+        path /v1/testnet4/*
+    }
+
+    reverse_proxy @btcv4 https://fbtc-api-t.example.com
+
+    reverse_proxy localhost:3000
+}

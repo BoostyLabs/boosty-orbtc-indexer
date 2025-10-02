@@ -1,0 +1,15 @@
+[Unit]
+Description=OrBTC Runes Indexer
+After=network.target network-online.target
+Requires=network-online.target
+
+[Service]
+Type=simple
+User=fbtc
+Group=fbtc
+EnvironmentFile=/srv/orbtc/services-conf.env
+ExecStart=/srv/orbtc/orbtc-indexer -c /srv/orbtc/orbtc.toml --runes --ignore-inputs --block 839995
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

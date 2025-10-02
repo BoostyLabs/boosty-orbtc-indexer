@@ -1,0 +1,125 @@
+TESTNET4
+---------------------------------------------------------------------------------------------------------------------
+btc_new_schema=# \di+
+                                                        List of relations
+ Schema |             Name             | Type  | Owner |       Table        | Persistence | Access method |    Size    | Description
+--------+------------------------------+-------+-------+--------------------+-------------+---------------+------------+-------------
+ public | _sqlx_migrations_pkey        | index | dev   | _sqlx_migrations   | permanent   | btree         | 16 kB      |
+ public | addresses_pkey               | index | dev   | addresses          | permanent   | btree         | 343 MB     |
+ public | api_keys_pkey                | index | dev   | api_keys           | permanent   | btree         | 8192 bytes |
+ public | blocks_pkey                  | index | dev   | blocks             | permanent   | btree         | 9080 kB    |
+ public | idx_addresses_address        | index | dev   | addresses          | permanent   | btree         | 471 MB     |
+ public | idx_blocks_hash              | index | dev   | blocks             | permanent   | btree         | 7624 kB    |
+ public | idx_blocks_height            | index | dev   | blocks             | permanent   | btree         | 3376 kB    |
+ public | idx_inputs_block             | index | dev   | inputs             | permanent   | btree         | 153 MB     |
+ public | idx_inputs_parent_tx_vout    | index | dev   | inputs             | permanent   | btree         | 1270 MB    |
+ public | idx_inputs_tx_vout           | index | dev   | inputs             | permanent   | btree         | 1270 MB    |
+ public | idx_outputs_address_id       | index | dev   | outputs            | permanent   | btree         | 508 MB     |
+ public | idx_outputs_amount           | index | dev   | outputs            | permanent   | btree         | 327 MB     |
+ public | idx_outputs_block            | index | dev   | outputs            | permanent   | btree         | 260 MB     |
+ public | idx_outputs_tx_vout          | index | dev   | outputs            | permanent   | btree         | 2174 MB    |
+ public | idx_runes_name               | index | dev   | runes              | permanent   | btree         | 1072 kB    |
+ public | idx_runes_outputs_address_id | index | dev   | runes_outputs      | permanent   | btree         | 63 MB      |
+ public | idx_runes_outputs_amount     | index | dev   | runes_outputs      | permanent   | btree         | 179 MB     |
+ public | idx_runes_outputs_block      | index | dev   | runes_outputs      | permanent   | btree         | 53 MB      |
+ public | idx_runes_outputs_rune       | index | dev   | runes_outputs      | permanent   | btree         | 44 MB      |
+ public | idx_runes_outputs_rune_id    | index | dev   | runes_outputs      | permanent   | btree         | 44 MB      |
+ public | idx_runes_outputs_tx_vout    | index | dev   | runes_outputs      | permanent   | btree         | 499 MB     |
+ public | idx_runes_rune_id            | index | dev   | runes              | permanent   | btree         | 736 kB     |
+ public | inputs_pkey                  | index | dev   | inputs             | permanent   | btree         | 483 MB     |
+ public | last_indexed_block_pkey      | index | dev   | last_indexed_block | permanent   | btree         | 16 kB      |
+ public | orphaned_blocks_pkey         | index | dev   | orphaned_blocks    | permanent   | btree         | 8192 bytes |
+ public | outputs_pkey                 | index | dev   | outputs            | permanent   | btree         | 827 MB     |
+ public | runes_outputs_pkey           | index | dev   | runes_outputs      | permanent   | btree         | 147 MB     |
+ public | runes_pkey                   | index | dev   | runes              | permanent   | btree         | 736 kB     |
+(28 rows)
+
+btc_new_schema=# \d+
+                                             List of relations
+ Schema |         Name         |   Type   | Owner | Persistence | Access method |    Size    | Description
+--------+----------------------+----------+-------+-------------+---------------+------------+-------------
+ public | _sqlx_migrations     | table    | dev   | permanent   | heap          | 16 kB      |
+ public | addresses            | table    | dev   | permanent   | heap          | 706 MB     |
+ public | api_keys             | table    | dev   | permanent   | heap          | 8192 bytes |
+ public | balances             | view     | dev   | permanent   |               | 0 bytes    |
+ public | blocks               | table    | dev   | permanent   | heap          | 14 MB      |
+ public | inputs               | table    | dev   | permanent   | heap          | 2889 MB    |
+ public | inputs_id_seq        | sequence | dev   | permanent   |               | 8192 bytes |
+ public | last_indexed_block   | table    | dev   | permanent   | heap          | 64 kB      |
+ public | orphaned_blocks      | table    | dev   | permanent   | heap          | 8192 bytes |
+ public | outputs              | table    | dev   | permanent   | heap          | 5203 MB    |
+ public | outputs_id_seq       | sequence | dev   | permanent   |               | 8192 bytes |
+ public | runes                | table    | dev   | permanent   | heap          | 9576 kB    |
+ public | runes_balances       | view     | dev   | permanent   |               | 0 bytes    |
+ public | runes_outputs        | table    | dev   | permanent   | heap          | 1090 MB    |
+ public | runes_outputs_id_seq | sequence | dev   | permanent   |               | 8192 bytes |
+ public | runes_utxos          | view     | dev   | permanent   |               | 0 bytes    |
+ public | utxos                | view     | dev   | permanent   |               | 0 bytes    |
+(17 rows)
+
+MAINNET
+---------------------------------------------------------------------------------------------------------------------
+
+btc_indexer=# \d+
+                                                List of relations
+ Schema |          Name           |   Type   |  Owner   | Persistence | Access method |    Size    | Description
+--------+-------------------------+----------+----------+-------------+---------------+------------+-------------
+ public | _sqlx_migrations        | table    | dev      | permanent   | heap          | 16 kB      |
+ public | api_keys                | table    | dev      | permanent   | heap          | 16 kB      |
+ public | balances                | view     | dev      | permanent   |               | 0 bytes    |
+ public | blocks                  | table    | dev      | permanent   | heap          | 121 MB     |
+ public | inputs                  | table    | dev      | permanent   | heap          | 549 GB     |
+ public | inputs_id_seq           | sequence | dev      | permanent   |               | 8192 bytes |
+ public | last_indexed_block      | table    | dev      | permanent   | heap          | 80 kB      |
+ public | orphaned_blocks         | table    | dev      | permanent   | heap          | 0 bytes    |
+ public | outputs                 | table    | dev      | permanent   | heap          | 710 GB     |
+ public | outputs_id_seq          | sequence | dev      | permanent   |               | 8192 bytes |
+ public | pg_stat_statements      | view     | postgres | permanent   |               | 0 bytes    |
+ public | pg_stat_statements_info | view     | postgres | permanent   |               | 0 bytes    |
+ public | runes                   | table    | dev      | permanent   | heap          | 104 MB     |
+ public | runes_balances          | view     | dev      | permanent   |               | 0 bytes    |
+ public | runes_outputs           | table    | dev      | permanent   | heap          | 23 GB      |
+ public | runes_outputs_id_seq    | sequence | dev      | permanent   |               | 8192 bytes |
+ public | runes_utxos             | view     | dev      | permanent   |               | 0 bytes    |
+ public | submitted_txs           | table    | dev      | permanent   | heap          | 8192 bytes |
+ public | utxo_locks              | table    | dev      | permanent   | heap          | 8192 bytes |
+ public | utxo_locks_id_seq       | sequence | dev      | permanent   |               | 8192 bytes |
+ public | utxos                   | view     | dev      | permanent   |               | 0 bytes    |
+(21 rows)
+---------------------------------------------------------------------------------------------------------------------
+
+
+btc_indexer=# \di+
+                                                        List of relations
+ Schema |           Name            | Type  | Owner |       Table        | Persistence | Access method |    Size    | Description
+--------+---------------------------+-------+-------+--------------------+-------------+---------------+------------+-------------
+ public | _sqlx_migrations_pkey     | index | dev   | _sqlx_migrations   | permanent   | btree         | 16 kB      |
+ public | api_keys_pkey             | index | dev   | api_keys           | permanent   | btree         | 16 kB      |
+ public | idx_blocks_hash           | index | dev   | blocks             | permanent   | btree         | 110 MB     |
+ public | idx_blocks_height         | index | dev   | blocks             | permanent   | btree         | 23 MB      |
+ public | idx_inputs_block          | index | dev   | inputs             | permanent   | btree         | 19 GB      |
+ public | idx_inputs_parent_tx_vout | index | dev   | inputs             | permanent   | btree         | 262 GB     |
+ public | idx_inputs_tx_vout        | index | dev   | inputs             | permanent   | btree         | 264 GB     |
+ public | idx_outputs_address       | index | dev   | outputs            | permanent   | btree         | 94 GB      |
+ public | idx_outputs_amount        | index | dev   | outputs            | permanent   | btree         | 25 GB      |
+ public | idx_outputs_block         | index | dev   | outputs            | permanent   | btree         | 21 GB      |
+ public | idx_outputs_tx_vout       | index | dev   | outputs            | permanent   | btree         | 291 GB     |
+ public | idx_runes_name            | index | dev   | runes              | permanent   | btree         | 8496 kB    |
+ public | idx_runes_outputs_address | index | dev   | runes_outputs      | permanent   | btree         | 944 MB     |
+ public | idx_runes_outputs_amount  | index | dev   | runes_outputs      | permanent   | btree         | 1978 MB    |
+ public | idx_runes_outputs_block   | index | dev   | runes_outputs      | permanent   | btree         | 653 MB     |
+ public | idx_runes_outputs_rune    | index | dev   | runes_outputs      | permanent   | btree         | 617 MB     |
+ public | idx_runes_outputs_rune_id | index | dev   | runes_outputs      | permanent   | btree         | 613 MB     |
+ public | idx_runes_outputs_tx_vout | index | dev   | runes_outputs      | permanent   | btree         | 9789 MB    |
+ public | idx_runes_rune_id         | index | dev   | runes              | permanent   | btree         | 6152 kB    |
+ public | inputs_pkey               | index | dev   | inputs             | permanent   | btree         | 62 GB      |
+ public | last_indexed_block_pkey   | index | dev   | last_indexed_block | permanent   | btree         | 16 kB      |
+ public | orphaned_blocks_pkey      | index | dev   | orphaned_blocks    | permanent   | btree         | 8192 bytes |
+ public | outputs_pkey              | index | dev   | outputs            | permanent   | btree         | 68 GB      |
+ public | runes_outputs_pkey        | index | dev   | runes_outputs      | permanent   | btree         | 1969 MB    |
+ public | runes_pkey                | index | dev   | runes              | permanent   | btree         | 6176 kB    |
+ public | submitted_txs_pkey        | index | dev   | submitted_txs      | permanent   | btree         | 8192 bytes |
+ public | utxo_key_indx             | index | dev   | utxo_locks         | permanent   | btree         | 8192 bytes |
+ public | utxo_lock_address_indx    | index | dev   | utxo_locks         | permanent   | btree         | 8192 bytes |
+ public | utxo_locks_pkey           | index | dev   | utxo_locks         | permanent   | btree         | 8192 bytes |
+(29 rows)

@@ -1,0 +1,5 @@
+# works only with nightly
+#group_imports = "StdExternalCrate"
+#imports_granularity = "Module"
+#imports_layout = "Horizontal"
+#unstable_features = true

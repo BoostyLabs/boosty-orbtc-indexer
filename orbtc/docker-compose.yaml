@@ -1,0 +1,49 @@
+services:
+  postgres:
+    image: ghcr.io/boostylabs/postgres:17-alpine
+    environment:
+      POSTGRES_USER: dev
+      POSTGRES_PASSWORD: dev
+      POSTGRES_DB: btc_indexer
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  bitcoind:
+    image: ghcr.io/boostylabs/bitcoin/bitcoin:28-alpine
+    environment:
+      BITCOIN_DATA: /opt/bitcoind-data/
+    ports:
+      - "127.0.0.1:48332:48332"
+    volumes:
+      - bitcoind_data:/opt/bitcoind-data
+    command:
+      -testnet4
+      -txindex
+      -server
+      -rpcuser=dev
+      -rpcpassword=dev
+      -rpcbind=0.0.0.0
+      -rpcallowip=0.0.0.0/0
+
+  redis:
+    image: redis:7.4.1
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: >
+      redis-server
+      --save 86400 1
+      --appendonly yes
+      --appendfsync everysec
+      --dir /data
+      --dbfilename dump.rdb
+      --appendfilename appendonly.aof
+    restart: always
+
+volumes:
+  bitcoind_data: {}
+  postgres_data: {}
+  redis_data: {}

@@ -1,0 +1,9 @@
+.DS_Store
+.idea
+*.log
+
+/bin/
+tmp/
+target/
+
+!scripts/config-example.toml

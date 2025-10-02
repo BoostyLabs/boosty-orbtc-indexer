@@ -1,0 +1,14 @@
+[Unit]
+Description=Node Exporter
+After=network.target
+
+[Service]
+User=postgres
+Group=postgres
+Type=simple
+Environment="DATA_SOURCE_NAME='user=postgres host=/var/run/postgresql/ sslmode=disable'"
+ExecStart=/usr/local/bin/postgres_exporter --collector.long_running_transactions --collector.stat_activity_autovacuum --collector.stat_statements --collector.statio_user_indexes
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

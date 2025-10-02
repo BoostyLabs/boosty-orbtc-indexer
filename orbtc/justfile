@@ -1,0 +1,38 @@
+set dotenv-load := true
+
+LINUX_IMAGE := "runes-dex/btc-indexer-linux"
+IMAGE := "runes-dex/btc-indexer"
+
+default: list
+
+list:
+    just --list
+
+docker-build:
+    docker build -t {{IMAGE}} .
+
+musl-release:
+    docker create --name dummy-indexer {{IMAGE}}
+    docker cp dummy-indexer:/app/indexer ./indexer-musl
+    docker rm -f dummy-indexer
+
+linux-release:
+    cd ../ && docker build -t {{LINUX_IMAGE}} -f btc-indexer/scripts/Dockerfile.ci-build .
+    docker create --name dummy-indexer {{LINUX_IMAGE}}
+    docker cp dummy-indexer:/opt/release ./bin/release
+    docker rm -f dummy-indexer
+
+release:
+    cargo build --release
+
+run-api:
+    cargo run -p btc-indexer -- -c ./config.toml api-server
+
+run-indexer:
+    cargo run -p btc-indexer -- -c ./config.toml indexer
+
+run-runes-indexer:
+    cargo run -p btc-indexer -- -c ./config.runes.toml legacy-rune-indexer
+
+format:
+    cargo +nightly fmt

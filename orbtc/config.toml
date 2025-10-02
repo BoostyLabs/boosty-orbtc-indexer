@@ -1,0 +1,19 @@
+access_keys = ["local_key"]
+
+[api]
+cors_domain = "*"
+listen_address = "127.0.0.1"
+port = 4000
+
+[db]
+automigrate = true
+dsn = "postgres://dev:dev@localhost/btc_indexer"
+
+[btc]
+address = "127.0.0.1:48332"
+network = "testnet4"
+rpc_password = "dev"
+rpc_user = "dev"
+
+[metrics]
+enable = true

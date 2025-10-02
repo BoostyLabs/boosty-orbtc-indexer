@@ -1,0 +1,15 @@
+[Unit]
+Description=Bitcoind Mainnet
+After=network.target network-online.target
+Requires=network-online.target
+
+[Service]
+Type=simple
+User=orbtc
+Group=orbtc
+WorkingDirectory=/srv/orbtc
+ExecStart=/srv/orbtc/bitcoind -datadir=/srv/orbtc/data/bitcoin/ -txindex -server -rpcuser=<redacted> -rpcpassword=<redacted>
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

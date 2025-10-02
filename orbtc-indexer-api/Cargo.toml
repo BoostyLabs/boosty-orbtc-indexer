@@ -1,0 +1,33 @@
+[package]
+edition = "2021"
+name = "orbtc-indexer-api"
+publish = false
+version = "0.4.2"
+
+[dependencies]
+actix-web.workspace = true
+anyhow.workspace = true
+api-core = { path = "../api-core" }
+bigdecimal.workspace = true
+bitcoin.workspace = true
+diesel = { version = "2.2.1", optional = true, features = [
+  "postgres",
+  "chrono",
+  "numeric",
+  "serde_json",
+  "uuid",
+] }
+hex.workspace = true
+ordinals.workspace = true
+reqwest = { workspace = true, optional = true }
+serde.workspace = true
+serde_json.workspace = true
+sha2 = "0.10.8"
+sqlx = { workspace = true, optional = true }
+thiserror.workspace = true
+
+[features]
+# default = ["sqlx", "diesel"]
+client = ["dep:reqwest"]
+diesel = ["dep:diesel"]
+sqlx = ["dep:sqlx"]

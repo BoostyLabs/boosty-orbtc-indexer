@@ -1,0 +1,53 @@
+call := just_executable() + " --justfile=" + justfile()
+
+default: list
+list:
+    just --list
+
+list-services:
+   @echo [APP] orbtc-api
+   @echo [APP] orbtc-indexer
+   @echo [APP] orbtc-runes-indexer
+   @echo [DEP] caddy
+   @echo [DEP] postgresql-17
+   @echo [DEP] bitcoind
+   @echo [OPS] node_exporter
+   @echo [OPS] postgres_exporter
+   @echo [OPS] process_exporter
+
+status NAME:
+   sudo systemctl status -n 3 --no-pager {{ NAME }}
+
+logs NAME:
+   sudo journalctl -fu {{ NAME }}
+
+status-system:
+   @call status caddy
+   @call status postgresql-17
+   @call status bitcoind
+   @call status node_exporter
+   @call status postgres_exporter
+   @call status process_exporter
+
+status-orbtc:
+   @call status orbtc-api
+   @call status orbtc-indexer
+   @call status orbtc-runes-indexer
+
+validate-caddy:
+   caddy validate --config /etc/caddy/Caddyfile
+   caddy validate --config ./Caddyfile
+
+update-caddy: validate-caddy
+   sudo cp ./Caddyfile /etc/caddy/Caddyfile
+   sudo systemctl restart caddy
+
+update-services:
+   sudo cp -rfv ./services/*.service /etc/systemd/system/
+   sudo systemctl daemon-reload
+
+upgrade-service NAME:
+   sudo cp ./services/{{ NAME }}.service /etc/systemd/system/
+   sudo systemctl daemon-reload
+   sudo systemctl restart {{ NAME }}
+   @call status {{ NAME }}

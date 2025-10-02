@@ -1,0 +1,1142 @@
+openapi: 3.0.3
+info:
+  title: OrBTC Indexer API
+  version: 0.5.3
+
+servers:
+  - url: http://localhost:4000
+
+paths:
+  /v1/healthcheck:
+    get:
+      tags:
+        - system
+      summary: Healthcheck endpoint
+      description: This endpoint is used to check if the service is up and running.
+      responses:
+        '200':
+          description: Ok Status
+
+  /v1/version:
+    get:
+      tags:
+        - system
+      summary: Version endpoint
+      description: This endpoint is used to get the version of the service.
+      responses:
+        '200':
+          description: App Info
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppInfo'
+
+  /v1/{network}/status:
+    get:
+      tags:
+        - system
+      summary: Status endpoint
+      description: Returns the last indexed block to assert the status of the service.
+      parameters:
+        - $ref: "#/components/parameters/Network"
+      responses:
+        "200":
+          description: "Sync status is returned"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  healthy:
+                    type: boolean
+                    description: overall status of service availability
+                  db:
+                    type: boolean
+                  btc_node:
+                    type: boolean
+                  btc_height:
+                    type: number
+                    description: height of the Bitcoin main chain
+                  btc_indexer:
+                    type: boolean
+                  btc_indexer_height:
+                    type: number
+                    description: the height of the last indexed block by btc indexer
+                  runes_indexer:
+                    type: boolean
+                  runes_indexer_height:
+                    type: number
+                    description: the height of the last indexed block by runes indexer
+
+  /v1/{network}/fee-rate:
+    get:
+      tags:
+        - btc
+      summary: Get BTC fee rate
+      description: This endpoint returns a bitcoin fee rate.
+      parameters:
+        - $ref: "#/components/parameters/Network"
+      responses:
+        "400":
+          $ref: "#/components/responses/400"
+        "401":
+          $ref: "#/components/responses/401"
+        "403":
+          $ref: "#/components/responses/403"
+        "500":
+          $ref: "#/components/responses/500"
+        "503":
+          $ref: "#/components/responses/503"
+        "200":
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FeeRate"
+
+  /v1/{network}/balance/{address}:
+    get:
+      tags:
+        - btc
+      summary: Get BTC balance by address
+      description: This endpoint is used to get a BTC balance by address.
+      parameters:
+        - $ref: "#/components/parameters/Network"
+        - $ref: "#/components/parameters/Address"
+      responses:
+        "400":
+          $ref: "#/components/responses/400"
+        "401":
+          $ref: "#/components/responses/401"
+        "403":
+          $ref: "#/components/responses/403"
+        "500":
+          $ref: "#/components/responses/500"
+        "503":
+          $ref: "#/components/responses/503"
+        "200":
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Balance"
+
+  /v1/{network}/balance-history/{address}:
+    get:
+      tags:
+        - btc
+      summary: Get history of BTC balance for the address
+      parameters:
+        - $ref: "#/components/parameters/Network"
+        - $ref: "#/components/parameters/Address"
+      responses:
+        "400":
+          $ref: "#/components/responses/400"
+        "401":
+          $ref: "#/components/responses/401"
+        "403":
+          $ref: "#/components/responses/403"
+        "500":
+          $ref: "#/components/responses/500"
+        "503":
+          $ref: "#/components/responses/503"
+        "200":
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BalanceHistoryPoint"
+
+  /v1/{network}/utxos/{address}:
+    get:
+      tags:
+        - btc
+      summary: List bitcoin UTXOs by address
+      description: This endpoint is used to list UTXOs by address.
+      parameters:
+        - $ref: "#/components/parameters/Network"
+        - $ref: "#/components/parameters/Address"
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Offset"
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/Order"
+        - $ref: "#/components/parameters/UtxoSortMode"
+        - $ref: "#/components/parameters/AmountThreshold"
+        - $ref: "#/components/parameters/NoRunes"
+        - $ref: "#/components/parameters/SkipPremature"
+      responses:
+        "400":
+          $ref: "#/components/responses/400"
+        "401":
+          $ref: "#/components/responses/401"
+        "403":
+          $ref: "#/components/responses/403"
+        "500":
+          $ref: "#/components/responses/500"
+        "503":
+          $ref: "#/components/responses/503"
+        "200":
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  meta:
+                    $ref: "#/components/schemas/ListResponseMeta"
+                  records:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Utxo"
+
+  /v1/{network}/tx:
+    post:
+      tags:
+        - btc
+      summary: Submit Transaction
+      description: This endpoint allows to submit a transaction to the Bitcoin network.
+      parameters:
+        - $ref: "#/components/parameters/Network"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SubmitTxReq"
+        required: true
+      responses:
+        "400":
+          $ref: "#/components/responses/400"
+        "401":
+          $ref: "#/components/responses/401"
+        "403":
+          $ref: "#/components/responses/403"
+        "500":
+          $ref: "#/components/responses/500"
+        "503":
+          $ref: "#/components/responses/503"
+        "200":
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SubmitTxResp"
+
+  /v1/{network}/tx/{tx_hash}:
+    post:
+      tags:
+        - btc
+      summary: Get Raw Transaction
+      description: This endpoint is a replacement for the RPC method **getrawtransaction**.
+      parameters:
+        - $ref: "#/components/parameters/Network"
+        - name: tx_hash
+          in: path
+          required: true
+          schema:
+            type: string
+            example: af7ef135a4469ec63af59e7244693418fdb96e852baf84c0adb70b28d9ec99e1
+      responses:
+        "400":
+          $ref: "#/components/responses/400"
+        "401":
+          $ref: "#/components/responses/401"
+        "403":
+          $ref: "#/components/responses/403"
+        "500":
+          $ref: "#/components/responses/500"
+        "503":
+          $ref: "#/components/responses/503"
+        "200":
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RawTxResponse"
+
+  /v1/{network}/runes:
+    get:
+      tags:
+        - runes
+      summary: List known runes
+      description: This endpoint is used to list known runes.
+      parameters:
+        - $ref: "#/components/parameters/Network"
+        - $ref: '#/components/parameters/RuneName'
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Order'
+      responses:
+        "400":
+          $ref: "#/components/responses/400"
+        "401":
+          $ref: "#/components/responses/401"
+        "403":
+          $ref: "#/components/responses/403"
+        "500":
+          $ref: "#/components/responses/500"
+        "503":
+          $ref: "#/components/responses/503"
+        "200":
+          description: "List of matched runes"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  meta:
+                    $ref: "#/components/schemas/ListResponseMeta"
+                  records:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Rune"
+
+  /v1/{network}/runes/search:
+    get:
+      tags:
+        - runes
+      summary: Search Runes by name
+      description: This endpoint is used to search for Runes.
+      parameters:
+        - $ref: "#/components/parameters/Network"
+        - name: s
+          in: query
+          required: true
+          schema:
+            type: string
+            example: BIG
+      responses:
+        "400":
+          $ref: "#/components/responses/400"
+        "401":
+          $ref: "#/components/responses/401"
+        "403":
+          $ref: "#/components/responses/403"
+        "500":
+          $ref: "#/components/responses/500"
+        "503":
+          $ref: "#/components/responses/503"
+        "200":
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  records:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Rune"
+
+  /v1/{network}/runes/{rune}:
+    get:
+      tags:
+        - runes
+      summary: Get Rune by name
+      description: This endpoint is used to get a Rune by name.
+      parameters:
+        - $ref: "#/components/parameters/Network"
+        - $ref: "#/components/parameters/Rune"
+      responses:
+        "400":
+          $ref: "#/components/responses/400"
+        "401":
+          $ref: "#/components/responses/401"
+        "403":
+          $ref: "#/components/responses/403"
+        "500":
+          $ref: "#/components/responses/500"
+        "503":
+          $ref: "#/components/responses/503"
+        "200":
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Rune"
+
+  /v1/{network}/runes/{rune}/balance/{address}:
+    get:
+      tags:
+        - rune
+      summary: Get rune balance by address
+      description: This endpoint is used to get a {RUNE} balance by address.
+      parameters:
+        - $ref: "#/components/parameters/Network"
+        - $ref: "#/components/parameters/Rune"
+        - $ref: "#/components/parameters/Address"
+      responses:
+        "400":
+          $ref: "#/components/responses/400"
+        "401":
+          $ref: "#/components/responses/401"
+        "403":
+          $ref: "#/components/responses/403"
+        "500":
+          $ref: "#/components/responses/500"
+        "503":
+          $ref: "#/components/responses/503"
+        "200":
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RuneBalance"
+
+  /v1/{network}/runes/{rune}/balance-history/{address}:
+    get:
+      tags:
+        - rune
+      summary: Get rune balance history points for address
+      parameters:
+        - $ref: "#/components/parameters/Network"
+        - $ref: "#/components/parameters/Rune"
+        - $ref: "#/components/parameters/Address"
+      responses:
+        "400":
+          $ref: "#/components/responses/400"
+        "401":
+          $ref: "#/components/responses/401"
+        "403":
+          $ref: "#/components/responses/403"
+        "500":
+          $ref: "#/components/responses/500"
+        "503":
+          $ref: "#/components/responses/503"
+        "200":
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RuneBalanceHistoryPoint"
+
+
+  /v1/{network}/runes/balance/{address}:
+    get:
+      tags:
+        - rune
+      summary: Get list of all runes balances for address
+      description: This endpoint is used to get all balance by address.
+      parameters:
+        - $ref: "#/components/parameters/Network"
+        - $ref: "#/components/parameters/Address"
+      responses:
+        "400":
+          $ref: "#/components/responses/400"
+        "401":
+          $ref: "#/components/responses/401"
+        "403":
+          $ref: "#/components/responses/403"
+        "500":
+          $ref: "#/components/responses/500"
+        "503":
+          $ref: "#/components/responses/503"
+        "200":
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  meta:
+                    $ref: "#/components/schemas/ListResponseMeta"
+                  records:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/RuneBalance"
+
+  /v1/{network}/runes/{rune}/balance:
+    get:
+      tags:
+        - rune
+      summary: Get list of rune holders
+      parameters:
+        - $ref: "#/components/parameters/Network"
+        - $ref: "#/components/parameters/Rune"
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Offset"
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/Order"
+        - $ref: "#/components/parameters/AmountThreshold"
+      responses:
+        "400":
+          $ref: "#/components/responses/400"
+        "401":
+          $ref: "#/components/responses/401"
+        "403":
+          $ref: "#/components/responses/403"
+        "500":
+          $ref: "#/components/responses/500"
+        "503":
+          $ref: "#/components/responses/503"
+        "200":
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  meta:
+                    $ref: "#/components/schemas/ListResponseMeta"
+                  records:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/RuneBalance"
+
+  /v1/{network}/runes/{rune}/utxos/{address}:
+    get:
+      tags:
+        - runes
+      summary: List UTXOs with by address and rune
+      description: This endpoint is used to list UTXOs by address.
+      parameters:
+        - $ref: "#/components/parameters/Network"
+        - $ref: "#/components/parameters/Rune"
+        - $ref: "#/components/parameters/Address"
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Offset"
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/Order"
+        - $ref: "#/components/parameters/UtxoSortMode"
+        - $ref: "#/components/parameters/AmountThreshold"
+        - $ref: "#/components/parameters/NoRunes"
+        - $ref: "#/components/parameters/SkipPremature"
+      responses:
+        "400":
+          $ref: "#/components/responses/400"
+        "401":
+          $ref: "#/components/responses/401"
+        "403":
+          $ref: "#/components/responses/403"
+        "500":
+          $ref: "#/components/responses/500"
+        "503":
+          $ref: "#/components/responses/503"
+        "200":
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  meta:
+                    $ref: "#/components/schemas/ListResponseMeta"
+                  records:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/RuneUtxo"
+
+components:
+  responses:
+    '200':
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: object
+            description: Placeholder
+    '400':
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            error:
+              code: 400
+              message: Bad Request
+              reason: null
+    '401':
+      description: Unauthorized. Api Key is unknown or invalid
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            error:
+              code: 401
+              message: Unauthorized
+    '403':
+      description: Forbidden. Api Key is blocked
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            error:
+              code: 403
+              message: Forbidden
+    '404':
+      description: Resource is not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            error:
+              code: 404
+              message: NOT_FOUND
+              reason: resource not found
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            error:
+              code: 500
+              message: "INTERNAL_SERVER_ERROR"
+              reason: some internal reason
+    '503':
+      description: Service temporally unavailable. BTC RPC is inaccessible or indexers are out of sync.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            error:
+              code: 503
+              message: "Service Unavailable"
+
+  parameters:
+    Network:
+      name: network
+      in: path
+      required: true
+      schema:
+        type: string
+        enum:
+          - mainnet
+          - testnet4
+        nullable: true
+
+    Address:
+      name: address
+      in: path
+      required: true
+      example: tb1ps07g3t8hctex0ula3jaxxa85dqw28ewl0krmnt8mlpxukmzp9zeqmzjfdw
+      schema:
+        type: string
+
+    Rune:
+      name: rune
+      in: path
+      required: true
+      schema:
+        title: Rune name
+        type: string
+
+    RuneName:
+      name: name
+      in: query
+      required: true
+      schema:
+        title: Rune name (can be partial name)
+        type: string
+
+    Limit:
+      name: limit
+      in: query
+      description: Number of records to return.
+      schema:
+        type: integer
+        format: uint32
+        nullable: true
+        minimum: 1
+        maximum: 100
+        default: 50
+
+    Offset:
+      name: offset
+      in: query
+      description: Offset is can be used instead of page number, if passed page is ignored.
+      schema:
+        type: integer
+        format: uint32
+        nullable: true
+        minimum: 0
+        maximum: 100
+        default: 0
+
+    Page:
+      name: page
+      in: query
+      description: Page number for pagination.
+      schema:
+        type: integer
+        format: unt32
+        nullable: true
+        minimum: 0
+
+    Order:
+      name: order
+      in: query
+      description: Order of the results.
+      schema:
+        type: string
+        enum:
+          - ASC
+          - DESC
+        nullable: true
+        default: DESC
+        example: ASC
+
+    AmountThreshold:
+      name: amount_threshold
+      in: query
+      required: false
+      description: Request would return utxos with value more than passed threshold
+      schema:
+        type: number
+
+    UtxoSortMode:
+      name: sorting
+      in: query
+      required: false
+      schema:
+        type: string
+        enum:
+          - age
+          - amount
+        default: amount
+
+    NoRunes:
+      name: no_runes
+      in: query
+      required: false
+      description: If passed, checks that utxos in response does not contain any runes on them. Slows down request.
+      schema:
+        type: boolean
+        default: false
+
+    SkipPremature:
+      name: skip_premature
+      in: query
+      required: false
+      description: If passed, checks that coibase utxos have age more than 100 blocks.
+      schema:
+        type: boolean
+        default: false
+
+  schemas:
+    AppInfo:
+      title: AppInfo
+      type: object
+      required:
+        - app
+        - build
+        - commit
+        - version
+      properties:
+        app:
+          type: string
+          example: runes_dex
+        build:
+          type: string
+          example: main
+        commit:
+          type: string
+          example: 03798661f49a25592975d96bf9a80b9b0555ae5a
+        version:
+          type: string
+          example: 0.4.5
+
+    Error:
+      title: Error
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: integer
+              format: int32
+              example: 404
+            message:
+              type: string
+              example: NOT_FOUND
+            reason:
+              type: string
+              nullable: true
+              example: resource not found
+
+    ListResponseMeta:
+      title: ListResponseMeta
+      type: object
+      properties:
+        page:
+          type: integer
+          format: int32
+          example: 0
+        limit:
+          type: integer
+          format: int32
+          example: 50
+        offset:
+          type: integer
+          format: int32
+          example: 0
+        has_more:
+          type: boolean
+          example: true
+        total_records:
+          type: integer
+          format: int64
+          example: 123
+
+    Balance:
+      title: BtcBalance
+      type: object
+      properties:
+        address:
+          type: string
+          example: tb1ps07g3t8hctex0ula3jaxxa85dqw28ewl0krmnt8mlpxukmzp9zeqmzjfdw
+        balance:
+          type: integer
+          minimum: 0
+          format: uint64
+        utxo_count:
+          type: integer
+          description: number of free utxo
+          minimum: 0
+          format: uint64
+
+    BalanceHistoryPoint:
+      title: BtcBalanceHistoryPoint
+      type: object
+      properties:
+        block:
+          type: integer
+          minimum: 0
+          format: uint64
+        balance:
+          type: integer
+          minimum: 0
+          format: uint64
+        income:
+          type: integer
+          minimum: 0
+          format: uint64
+        spent:
+          type: integer
+          minimum: 0
+          format: uint64
+        in_count:
+          type: integer
+          minimum: 0
+          format: uint64
+        out_count:
+          type: integer
+          minimum: 0
+          format: uint64
+
+    Utxo:
+      title: Utxo
+      type: object
+      properties:
+        id:
+          type: string
+          format: int64
+          example: 123
+        block:
+          type: integer
+          format: int64
+          example: 3009048
+        tx_id:
+          type: integer
+          format: int32
+          example: 1
+        tx_hash:
+          type: string
+          example: af7ef135a4469ec63af59e7244693418fdb96e852baf84c0adb70b28d9ec99e1
+        vout:
+          type: integer
+          format: int32
+          example: 0
+        address:
+          type: string
+          example: bc1p0x6psjqeawtw8zvekup2gcg8uuwejhgjfad3sp9xklmpeaq80m4qd0ly9f
+        pk_script:
+          type: string
+          example: 76a914c0e3d9d0c2f0a5e2a0d6a9e1f3c5f6e8c8d7d88ac
+        amount:
+          type: integer
+          format: int64
+          example: 600
+        spend:
+          type: boolean
+          example: false
+
+    FeeRate:
+      title: FeeRate
+      type: object
+      required:
+        - fast
+        - normal
+        - min
+      properties:
+        fast:
+          type: integer
+          format: int64
+          example: 100
+        normal:
+          type: integer
+          format: int64
+          example: 50
+        min:
+          type: integer
+          format: int64
+          example: 20
+
+    SubmitTxReq:
+      title: SubmitTxReq
+      type: object
+      required:
+        - tx
+      properties:
+        tx:
+          type: string
+          description: hex-encoded raw signed transaction
+
+    SubmitTxResp:
+      title: SubmitTxResp
+      type: object
+      properties:
+        result:
+          type: object
+          nullable: true
+          properties:
+            tx_hash:
+              type: string
+              example: af7ef135a4469ec63af59e7244693418fdb96e852baf84c0adb70b28d9ec99e1
+        error:
+          type: object
+          nullable:  true
+          properties:
+            code:
+              type: number
+            message:
+              type: string
+            data:
+              type: object
+
+    RawTxResponse:
+      title: RawTxResponse
+      type: object
+      properties:
+        result:
+          type: object
+          nullable: true
+          properties:
+            in_active_chain:
+              type: boolean
+            confirmations:
+              type: number
+            time:
+              type: number
+            blocktime:
+              type: number
+            blockhash:
+              type: string
+            blockheight:
+              type: number
+            txnumber:
+              type: number
+            raw_tx:
+              type: string
+              example: af7ef135a4469ec63af59...
+        error:
+          type: object
+          nullable:  true
+          properties:
+            code:
+              type: number
+            message:
+              type: string
+            data:
+              type: object
+
+    Rune:
+      title: Rune
+      type: object
+      properties:
+        rune_id:
+          type: string
+          description: "block number : transaction number in that block"
+          example: "3009048:5"
+        name:
+          type: string
+          example: "MAXDECIMALSRUNESOBIG"
+        display_name:
+          type: string
+          example: "MAXDECIMALSRUNESOBIG"
+        symbol:
+          type: string
+          description: A single UTF8 character, including emoji
+          example: "¤"
+        block:
+          type: integer
+          format: int64
+          example: 3009048
+        tx_id:
+          type: integer
+          description: A tx position in a block
+          format: int32
+          example: 5
+        mints:
+          type: integer
+          format: int32
+          example: 0
+        max_supply:
+          type: string
+          description: "Total amount of runes minted"
+          example: "1000000000"
+        minted:
+          type: string
+          example: "1000000000"
+        in_circulation:
+          type: string
+          description: "Total amount of runes in circulation (max_supply - burned)"
+          example: "1000000000"
+        divisibility:
+          type: integer
+          description: Number of subunits in a super unit of runes
+          format: int32
+          minimum: 0
+          maximum: 38
+          example: 8
+        turbo:
+          type: boolean
+          example: true
+        timestamp:
+          type: integer
+          format: int64
+          example: 1727898475
+        etching_tx:
+          type: string
+          example: "81972d23a9abaa1c6f0d96b7bccd9af905ff8a4f44ac50f2a62366f92e5a8efb"
+        commitment_tx:
+          type: string
+          example: "3caae66d4c38c46f56f12571fc518bbb36ce3ec03a4e3b6c3ed44dbee9fa9630"
+        raw_data:
+          type: string
+          description: a raw transaction hex
+          example: "7b22656469637473223a5b5d2c2265746368696e67223a7b2264697669736962696c697479223a33382c227072656d696e65223a313030303030303030302c2272756e65223a224d4158444543494d414c5352554e45534f424947222c2273706163657273223a302c2273796d626f6c223a6e756c6c2c227465726d73223a6e756c6c2c22747572626f223a747275657d2c226d696e74223a6e756c6c2c22706f696e746572223a317d"
+        is_featured:
+          type: boolean
+          example: false
+          default: false
+
+    RuneBalance:
+      title: BtcBalance
+      type: object
+      properties:
+        address:
+          type: string
+          example: tb1ps07g3t8hctex0ula3jaxxa85dqw28ewl0krmnt8mlpxukmzp9zeqmzjfdw
+        rune_id:
+          type: string
+          description: "block number : transaction number in that block"
+          example: "3009048:5"
+        name:
+          type: string
+          example: "MAXDECIMALSRUNESOBIG"
+        symbol:
+          type: string
+          description: A single UTF8 character, including emoji
+          example: "¤"
+        balance:
+          type: string
+          description: uint128
+          example: "1000000000"
+        btc_balance:
+          type: integer
+          minimum: 0
+          format: uint64
+        utxo_count:
+          type: integer
+          description: number of free utxo
+          minimum: 0
+          format: uint64
+
+    RuneBalanceHistoryPoint:
+      title: RuneBalanceHistoryPoint
+      type: object
+      properties:
+        rune_balance:
+          type: string
+          description: uint128
+          example: "1000000000"
+        rune_income:
+          type: string
+          description: uint128
+          example: "1000000000"
+        rune_spent:
+          type: string
+          description: uint128
+          example: "1000000000"
+        btc_balance:
+          type: integer
+          minimum: 0
+          format: uint64
+        btc_income:
+          type: integer
+          minimum: 0
+          format: uint64
+        btc_spent:
+          type: integer
+          minimum: 0
+          format: uint64
+        in_count:
+          type: integer
+          minimum: 0
+          format: uint64
+        out_count:
+          type: integer
+          minimum: 0
+          format: uint64
+
+    RuneUtxo:
+      title: RuneUtxo
+      type: object
+      properties:
+        id:
+          type: string
+          format: int64
+          example: 123
+        block:
+          type: integer
+          format: int64
+          example: 3009048
+        tx_id:
+          type: integer
+          format: int32
+          example: 1
+        tx_hash:
+          type: string
+          example: af7ef135a4469ec63af59e7244693418fdb96e852baf84c0adb70b28d9ec99e1
+        vout:
+          type: integer
+          format: int32
+          example: 0
+        rune:
+          type: string
+          example: MAXDECIMALSRUNESOBIG
+        address:
+          type: string
+          example: bc1p0x6psjqeawtw8zvekup2gcg8uuwejhgjfad3sp9xklmpeaq80m4qd0ly9f
+        pk_script:
+          type: string
+          example: 76a914c0e3d9d0c2f0a5e2a0d6a9e1f3c5f6e8c8d7d88ac
+        amount:
+          type: string
+          example: "1000000000"
+        btc_amount:
+          type: integer
+          format: int64
+          example: 600
+        spend:
+          type: boolean
+          example: false

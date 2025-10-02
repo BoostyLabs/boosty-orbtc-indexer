@@ -1,0 +1,24 @@
+fee_adjustment = 1
+min_fee_rate = 2
+
+[api]
+cors_domain = "*"
+listen_address = "127.0.0.1"
+port = 3000
+
+[db]
+automigrate = true
+dsn = "postgres://dev:dev@localhost/orbtc_indexer"
+
+[btc]
+address = "127.0.0.1:8332"
+network = "mainnet"
+rpc_password = "redacted"
+rpc_user = "redacted"
+
+[metrics]
+enable = true
+
+[cache]
+enable = true
+redis = "redis://127.0.0.1:6379/0"
